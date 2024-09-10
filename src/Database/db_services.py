@@ -17,19 +17,18 @@ cur = conn.cursor()
 def insert_data_to_db(data_frame):
     # Create table if it doesn't exist
     create_table_query = """
-    CREATE TABLE IF NOT EXISTS wave_forecast (
-        date TIMESTAMP PRIMARY KEY,
-        wave_height FLOAT,
-        swell_wave_height FLOAT
-    );"""
+        CREATE TABLE IF NOT EXISTS wave_forecast (
+        id SERIAL PRIMARY KEY,
+        forecast_date TIMESTAMP NOT NULL,
+        wave_height NUMERIC(5,2),
+        swell_wave_height NUMERIC(5,2));"""
     cur.execute(create_table_query)
     conn.commit()
 
     # Insert data from the DataFrame into PostgreSQL
     insert_query = """
-        INSERT INTO wave_forecast (date, wave_height, swell_wave_height)
+        INSERT INTO wave_forecast (forecast_date, wave_height, swell_wave_height)
         VALUES (%s, %s, %s)
-        ON CONFLICT (date) DO NOTHING
     """
     for row in data_frame.itertuples(index=False):
         cur.execute(insert_query, (row.date, row.wave_height, row.swell_wave_height))
